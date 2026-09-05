@@ -45,7 +45,24 @@ const api = async (path, body) => {
 const initData = () => (tg ? tg.initData : '');
 function fmtCountdown(ms){const s=Math.ceil(ms/1000),h=Math.floor(s/3600),m=Math.floor((s%3600)/60),x=s%60;return h?`${h}h ${m}m`:`${m}m ${x}s`}
 const fmtDate = (d) => new Date(d).toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
-const hap = (t) => { try { tg?.HapticFeedback?.notificationOccurred(t); } catch {} };
+// ---------- Telegram SDK: haptics + toast notifications ----------
+const tap = (style = 'light') => { try { tg?.HapticFeedback?.impactOccurred(style); } catch {} };  // press feedback
+const hap = (t) => { try { tg?.HapticFeedback?.notificationOccurred(t); } catch {} };              // outcome feedback
+// every interactive press (buttons, tabs, material cards, list rows, CTAs) -> light impact
+document.addEventListener('click', (e) => {
+  if (e.target.closest('button, .mat-card, .wd-item')) tap('light');
+}, true);
+// bottom-of-screen toast — replaces browser alerts for transient feedback
+function toast(msg, type = 'success') {
+  let holder = $('toastHolder');
+  if (!holder) { holder = document.createElement('div'); holder.id = 'toastHolder'; document.body.appendChild(holder); }
+  const el = document.createElement('div');
+  el.className = 'toast ' + type;
+  const icon = type === 'error' ? '!' : type === 'info' ? '•' : '✓';
+  el.innerHTML = `<span class="toast-ic">${icon}</span><span>${msg}</span>`;
+  holder.appendChild(el);
+  setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 260); }, 2600);
+}
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const MODE_META = { quiz: { t: '🧠 Quiz', ic: '🧠' }, summary: { t: '📝 Summary', ic: '📝' }, simple: { t: '💡 Simple explanation', ic: '💡' } };
 
@@ -165,13 +182,13 @@ $('addMatBtn').addEventListener('click', async () => {
   if (text.length < 150) { $('matStatus').textContent = `Please paste at least 150 characters (you have ${text.length}).`; return; }
   $('addMatBtn').disabled = true; $('matStatus').textContent = 'Saving…';
   if (DEMO) {
-    $('matStatus').textContent = '✅ Saved (preview)';
+    hap('success'); toast('Material saved (preview)');
     $('matTitle').value = ''; $('matText').value = '';
     MATERIALS.unshift({ id: Date.now(), title: title || 'My notes', source: 'paste', created_at: new Date().toISOString() });
     renderMaterialsLocal(); $('addMatBtn').disabled = false; return;
   }
   const data = await api('/api/materials', { initData: initData(), title, text });
-  if (data.ok) { hap('success'); $('matStatus').textContent = '✅ Saved! Scroll down to open it.'; $('matTitle').value = ''; $('matText').value = ''; loadMaterials(); }
+  if (data.ok) { hap('success'); toast('Material saved ✓'); $('matStatus').textContent = ''; $('matTitle').value = ''; $('matText').value = ''; loadMaterials(); }
   else if (data.error === 'too_short') $('matStatus').textContent = `Please paste at least ${data.min} characters.`;
   else $('matStatus').textContent = 'Could not save. Try again.';
   $('addMatBtn').disabled = false;
@@ -208,7 +225,7 @@ document.querySelectorAll('.gen-btn').forEach((b) => b.addEventListener('click',
   if (!currentMaterial) return;
   document.querySelectorAll('.gen-btn').forEach((x) => (x.disabled = true));
   $('genStatus').textContent = '🪄 Working… (this can take a few seconds)';
-  hap('impact');
+  tap('medium');
 
   if (DEMO) { demoGenerate(mode); return; }
 
@@ -216,7 +233,7 @@ document.querySelectorAll('.gen-btn').forEach((b) => b.addEventListener('click',
   document.querySelectorAll('.gen-btn').forEach((x) => (x.disabled = false));
 
   if (data.ok) {
-    hap('success');
+    hap('success'); toast(`${MODE_META[mode].ic} ${MODE_META[mode].t} ready`);
     ME.remaining = data.remaining; renderQuota(ME.remaining, ME.is_premium);
     currentItem = { id: data.item_id, type: mode, content: data.content };
     openMaterial(currentMaterial.id); // refresh items list
@@ -274,7 +291,6 @@ function renderQuestion() {
     ${q.options.map((o, k) => `<button class="opt" data-k="${k}">${esc(o)}</button>`).join('')}
     <div id="qFeedback" class="muted"></div>`;
   $('itemBody').querySelectorAll('.opt').forEach((b) => b.addEventListener('click', () => answerQuiz(Number(b.dataset.k))));
-  hap('impact');
 }
 function answerQuiz(k) {
   if (quiz.answered) return;
@@ -309,24 +325,24 @@ $('adBtn').addEventListener('click', async () => {
   $('adBtn').disabled = true; $('adStatus').textContent = 'Loading ad…';
   const ok = await showRewardedAd();
   if (!ok) { $('adStatus').textContent = 'Ad skipped or unavailable.'; $('adBtn').disabled = false; return; }
-  if (DEMO) { hap('success'); ME.remaining += 2; ME.bonus += 2; renderQuota(ME.remaining, false); $('adStatus').textContent = '+2 actions! 🎉'; $('adBtn').disabled = false; return; }
+  if (DEMO) { hap('success'); toast('+2 actions added 🎉'); ME.remaining += 2; ME.bonus += 2; renderQuota(ME.remaining, false); $('adBtn').disabled = false; return; }
   const data = await api('/api/bonus', { initData: initData() });
-  if (data.ok) { hap('success'); ME.remaining = data.remaining; ME.bonus = data.bonus; renderQuota(ME.remaining, ME.is_premium); $('adStatus').textContent = `+${data.gained} actions! 🎉`; }
+  if (data.ok) { hap('success'); toast(`+${data.gained} actions added 🎉`); ME.remaining = data.remaining; ME.bonus = data.bonus; renderQuota(ME.remaining, ME.is_premium); $('adStatus').textContent = ''; }
   else if (data.error === 'cooldown') $('adStatus').textContent = 'Ad ready again in ' + fmtCountdown(data.retry_in_ms);
   else $('adStatus').textContent = 'Try again later.';
   $('adBtn').disabled = false;
 });
 $('starsBtn').addEventListener('click', async () => {
   $('starsBtn').disabled = true; $('starsStatus').textContent = 'Opening invoice…';
-  if (DEMO) { $('starsStatus').textContent = 'Preview mode — purchases work on the live app.'; $('starsBtn').disabled = false; return; }
+  if (DEMO) { toast('Preview mode — purchases work on the live app', 'info'); $('starsBtn').disabled = false; return; }
   const data = await api('/api/stars', { initData: initData() });
-  if (data.ok) $('starsStatus').textContent = '💬 Check your chat with the bot to pay with Stars!';
+  if (data.ok) { toast('Check the bot chat to pay with Stars ⭐', 'info'); $('starsStatus').textContent = ''; }
   else if (data.error === 'already_premium') $('starsStatus').textContent = 'You already have an active pass ⭐';
   else $('starsStatus').textContent = 'Could not create invoice. Try again.';
   $('starsBtn').disabled = false;
 });
 $('copyBtn').addEventListener('click', async () => {
-  try { await navigator.clipboard.writeText($('refLink').value); $('copyBtn').textContent = 'Copied!'; hap('success'); setTimeout(() => ($('copyBtn').textContent = 'Copy'), 1500); }
+  try { await navigator.clipboard.writeText($('refLink').value); $('copyBtn').textContent = 'Copied!'; hap('success'); toast('Invite link copied'); setTimeout(() => ($('copyBtn').textContent = 'Copy'), 1500); }
   catch { $('refLink').select(); document.execCommand('copy'); }
 });
 
@@ -358,7 +374,7 @@ function demoDetail() {
 }
 function demoGenerate(mode) {
   document.querySelectorAll('.gen-btn').forEach((x) => (x.disabled = false));
-  hap('success');
+  hap('success'); toast(`${MODE_META[mode].ic} ${MODE_META[mode].t} ready (preview)`);
   ME.remaining = Math.max(0, ME.remaining - 1); renderQuota(ME.remaining, false);
   if (mode === 'quiz') {
     currentItem = { type: 'quiz', content: JSON.stringify({ questions: [
@@ -376,5 +392,6 @@ function demoGenerate(mode) {
 }
 
 // ---------- Boot ----------
+try { if (tg && tg.setBackgroundColor) tg.setBackgroundColor('#F6F4EE'); } catch (e) {} // blend Telegram chrome with the paper theme
 initAds();
 load();

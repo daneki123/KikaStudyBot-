@@ -339,3 +339,30 @@ body{
 .empty-s{color:var(--ink-55);font-size:var(--fs-sm);line-height:1.55;margin-top:6px;max-width:270px}
 .empty-cta{width:auto;margin-top:18px;border-radius:999px;padding:12px 24px}
 @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+
+/* ============================================================
+   Toast notifications (bottom of screen)
+   ============================================================ */
+#toastHolder{
+  position:fixed;left:50%;transform:translateX(-50%);
+  bottom:calc(64px + var(--tg-bottom));
+  z-index:50;display:flex;flex-direction:column;align-items:center;gap:8px;
+  width:min(92vw,400px);pointer-events:none;
+}
+.toast{
+  display:flex;align-items:center;gap:10px;max-width:100%;
+  background:rgba(255,255,255,.85);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border:1px solid rgba(0,0,0,.1);
+  border-radius:999px;padding:11px 18px;
+  font-size:var(--fs-sm);font-weight:600;color:var(--ink);
+  box-shadow:0 8px 30px rgba(15,23,42,.14);
+  animation:toastIn .25s ease;
+}
+.toast.out{animation:toastOut .25s ease forwards}
+.toast-ic{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:800;color:#fff;flex:none}
+.toast.success .toast-ic{background:var(--good)}
+.toast.error .toast-ic{background:var(--bad)}
+.toast.info .toast-ic{background:var(--accent)}
+@keyframes toastIn{from{opacity:0;transform:translateY(10px) scale(.97)}to{opacity:1;transform:none}}
+@keyframes toastOut{to{opacity:0;transform:translateY(8px) scale(.97)}}
