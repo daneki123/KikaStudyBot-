@@ -1,6 +1,7 @@
 /* ============================================================
    Kika — Study theme
-   Paper texture · Deep Slate Blue ink (#0F172A) · Telegram-native type
+   Paper texture · Deep Slate Blue ink (#0F172A) · Inter/SF Pro type
+   Glassmorphic cards · Warm taupe (#a57d7d) primary actions
    Fluid, mobile-first, max-width 480px centered
    ============================================================ */
 
@@ -136,8 +137,10 @@ body{
    Cards & forms
    ============================================================ */
 .card{
-  background:var(--card);
-  border:1px solid var(--ink-12);           /* structural outline */
+  background:rgba(255,255,255,.7);          /* glassmorphism */
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  border:1px solid rgba(0,0,0,.1);
   border-radius:var(--radius);
   padding:16px;margin:0 16px 14px;
   box-shadow:var(--shadow);
@@ -161,21 +164,27 @@ body{
 .btn-grad{
   width:100%;border:none;border-radius:var(--radius-sm);
   padding:13px 16px;font:inherit;font-size:var(--fs-body);font-weight:600;
-  letter-spacing:-.005em;color:#fff;background:var(--accent);
+  letter-spacing:-.005em;color:#fff;background:var(--taupe);
   cursor:pointer;margin-top:12px;
-  box-shadow:0 1px 2px rgba(15,23,42,.12);
+  box-shadow:0 1px 2px rgba(15,23,42,.10);
   transition:background .15s,transform .1s;
 }
-.btn-grad:active{background:var(--accent-press);transform:scale(.985)}
+.btn-grad:active{background:var(--taupe-press);transform:scale(.985)}
 .btn-grad:disabled{opacity:.45;cursor:default}
-.btn-grad.sm{width:auto;padding:10px 14px;font-size:var(--fs-sm);margin-top:0}
-.btn-stars{
-  width:100%;border:1px solid rgba(138,98,16,.28);border-radius:var(--radius-sm);
-  padding:13px 16px;font:inherit;font-size:var(--fs-body);font-weight:600;
-  color:var(--gold);background:var(--gold-soft);
-  cursor:pointer;margin-top:12px;transition:transform .1s;
+.btn-grad.sm{
+  width:auto;padding:10px 14px;font-size:var(--fs-sm);margin-top:0;
+  color:var(--taupe);background:var(--taupe-soft);
+  border:1px solid var(--taupe-line);box-shadow:none;
 }
-.btn-stars:active{transform:scale(.985)}
+.btn-stars{
+  width:100%;border:none;border-radius:var(--radius-sm);
+  padding:13px 16px;font:inherit;font-size:var(--fs-body);font-weight:600;
+  letter-spacing:-.005em;color:#fff;background:var(--taupe);
+  cursor:pointer;margin-top:12px;
+  box-shadow:0 1px 2px rgba(15,23,42,.10);
+  transition:background .15s,transform .1s;
+}
+.btn-stars:active{background:var(--taupe-press);transform:scale(.985)}
 .btn-stars:disabled{opacity:.45}
 
 /* ============================================================
@@ -204,7 +213,7 @@ body{
   font:inherit;font-size:var(--fs-xs);font-weight:600;letter-spacing:.02em;
   cursor:pointer;transition:transform .1s,border-color .15s,background .15s;
 }
-.gen-btn:active{transform:scale(.96);border-color:var(--accent);background:var(--accent-soft)}
+.gen-btn:active{transform:scale(.96);border-color:var(--taupe);background:var(--taupe-soft)}
 .gen-btn:disabled{opacity:.45}
 .gen-btn .gi{font-size:22px;line-height:1}
 .mat-text{max-height:220px;overflow-y:auto;white-space:pre-wrap}
