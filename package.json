@@ -1,0 +1,13 @@
+{
+  "name": "kika-study-bot",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Kika — turn your notes and PDFs into AI quizzes and summaries (Telegram Mini App).",
+  "engines": { "node": ">=18" },
+  "dependencies": {
+    "pdf-parse": "^1.1.1"
+  },
+  "scripts": {
+    "test": "node test/validate.test.js"
+  }
+}

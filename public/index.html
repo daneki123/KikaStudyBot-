@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
+  <title>Kika — Study with AI</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="bg" aria-hidden="true">
+    <div class="aurora a1"></div>
+    <div class="aurora a2"></div>
+    <div class="aurora a3"></div>
+    <div class="grid"></div>
+    <div class="noise"></div>
+    <div class="vignette"></div>
+  </div>
+
+  <div class="app">
+    <header class="topbar">
+      <div class="brand"><span class="logo">⬡</span> KIKA <small>STUDY AI</small></div>
+      <div class="quota-pill" id="quotaPill">— left</div>
+    </header>
+
+    <main class="screens" id="screens">
+
+      <!-- ============ STUDY ============ -->
+      <section data-screen="study" class="screen active">
+        <div class="study-scroll">
+
+          <!-- LIST VIEW -->
+          <div id="viewList">
+            <h2 class="screen-title">📚 My materials</h2>
+            <div class="card">
+              <div class="card-h">＋ Add material</div>
+              <input id="matTitle" class="inp" placeholder="Title (e.g. Biology — Cell division)" />
+              <textarea id="matText" class="inp ta" placeholder="Paste your notes, handout or textbook text here… (min 150 characters)"></textarea>
+              <button id="addMatBtn" class="btn-grad">Add material</button>
+              <div id="matStatus" class="muted"></div>
+              <div class="muted">📄 Or send any <b>PDF</b> to the bot in chat — it lands here automatically.</div>
+            </div>
+            <div id="matList" class="muted" style="margin:0 16px">Loading…</div>
+          </div>
+
+          <!-- DETAIL VIEW -->
+          <div id="viewDetail" hidden>
+            <button class="back-btn" data-back="list">← Back</button>
+            <h2 class="screen-title" id="detailTitle">Material</h2>
+            <div class="card">
+              <div class="card-h">🪄 Turn it into…</div>
+              <div class="gen-row">
+                <button class="gen-btn" data-mode="quiz"><span class="gi">🧠</span>Quiz</button>
+                <button class="gen-btn" data-mode="summary"><span class="gi">📝</span>Summary</button>
+                <button class="gen-btn" data-mode="simple"><span class="gi">💡</span>Simplify</button>
+              </div>
+              <div id="genStatus" class="muted"></div>
+            </div>
+            <div class="card">
+              <div class="card-h">🗂 Saved items</div>
+              <div id="itemList" class="muted">Nothing yet — generate something above!</div>
+            </div>
+            <div class="card">
+              <div class="card-h">📄 Material text</div>
+              <div class="muted mat-text" id="detailText"></div>
+            </div>
+          </div>
+
+          <!-- ITEM VIEW -->
+          <div id="viewItem" hidden>
+            <button class="back-btn" data-back="detail">← Back</button>
+            <h2 class="screen-title" id="itemTitle">Item</h2>
+            <div class="card" id="itemBody"></div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ============ BOOST ============ -->
+      <section data-screen="boost" class="screen">
+        <div class="study-scroll">
+          <h2 class="screen-title">⚡ Get more actions</h2>
+
+          <div class="card">
+            <div class="card-h">Your AI actions</div>
+            <div class="quota-row">
+              <div><span class="quota-big" id="boostRemaining">0</span><div class="stat-lbl">REMAINING</div></div>
+              <div><span class="quota-big dim" id="boostUsed">0</span><div class="stat-lbl">USED TODAY</div></div>
+              <div><span class="quota-big gold" id="boostBonus">0</span><div class="stat-lbl">BONUS</div></div>
+            </div>
+            <div class="muted" id="boostReset"></div>
+            <div id="premiumBadge" class="premium-badge" hidden>⭐ STUDY PASS ACTIVE — UNLIMITED</div>
+          </div>
+
+          <div class="card">
+            <div class="card-h">🎁 Watch an ad</div>
+            <div class="muted">Get <b id="adBonusLabel">+2</b> extra AI actions instantly.</div>
+            <button id="adBtn" class="btn-grad">▶ Watch &amp; Earn</button>
+            <div id="adStatus" class="muted"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-h">⭐ Study Pass</div>
+            <div class="muted" id="passDesc">Unlimited AI actions for 30 days.</div>
+            <button id="starsBtn" class="btn-stars">⭐ Get Study Pass</button>
+            <div id="starsStatus" class="muted"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-h">Invite friends 👥</div>
+            <div class="muted">You earn <b id="refBonusLabel">+3</b> actions when a friend starts studying.</div>
+            <div class="ref-row">
+              <input id="refLink" class="inp" readonly />
+              <button id="copyBtn" class="btn-grad sm">Copy</button>
+            </div>
+            <div class="muted"><b id="refCount">0</b> friends joined</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ ADMIN ============ -->
+      <section data-screen="admin" class="screen">
+        <div class="study-scroll">
+          <h2 class="screen-title">⚙️ Admin · Top students</h2>
+          <div id="adminList" class="muted" style="margin:0 16px">Loading…</div>
+        </div>
+      </section>
+
+    </main>
+
+    <nav class="tabbar">
+      <button class="tab active" data-go="study"><span class="ic">📚</span>STUDY</button>
+      <button class="tab" data-go="boost"><span class="ic">⚡</span>BOOST</button>
+      <button class="tab" id="adminTab" data-go="admin" hidden><span class="ic">⚙️</span>ADMIN</button>
+    </nav>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
