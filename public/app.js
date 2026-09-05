@@ -115,14 +115,14 @@ function go(screen) {
   if (screen === 'boost') renderBoost();
   if (screen === 'admin') DEMO ? ($('adminList').innerHTML = '<div class="muted">Admin stats appear here for the owner.</div>') : loadAdmin();
   try { if (location.hash.indexOf('tgWebAppData') === -1 && location.hash !== '#/' + screen) location.hash = '#/' + screen; } catch (e) {} // sync URL (never clobber Telegram's fragment)
-  $('.screens').scrollTop = 0;
+  $('screens').scrollTop = 0;
 }
 document.querySelectorAll('[data-back]').forEach((el) => el.addEventListener('click', () => showView(el.dataset.back)));
 function showView(v) {
   $('viewList').hidden = v !== 'list';
   $('viewDetail').hidden = v !== 'detail';
   $('viewItem').hidden = v !== 'item';
-  $('.screens').scrollTop = 0;
+  $('screens').scrollTop = 0;
 }
 
 // ---------- Router (hash routes) + 404 + error boundary ----------
@@ -130,7 +130,7 @@ const ROUTES = { study: 'study', boost: 'boost', admin: 'admin' };
 function showNotFound() {
   document.querySelectorAll('.screen').forEach((s) => s.classList.toggle('active', s.dataset.screen === 'notfound'));
   document.querySelectorAll('.tab').forEach((t) => t.classList.remove('active'));
-  $('.screens').scrollTop = 0;
+  $('screens').scrollTop = 0;
 }
 function handleRoute() {
   const raw = location.hash || '';
