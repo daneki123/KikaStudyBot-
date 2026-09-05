@@ -306,3 +306,36 @@ body{
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none!important;transition:none!important}
 }
+
+/* ============================================================
+   Skeleton loaders (match expected content heights)
+   ============================================================ */
+.sk{position:relative;overflow:hidden;background:rgba(15,23,42,.07);border-radius:6px}
+.sk::after{
+  content:"";position:absolute;inset:0;transform:translateX(-100%);
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.75),transparent);
+  animation:shimmer 1.4s infinite;
+}
+@keyframes shimmer{100%{transform:translateX(100%)}}
+/* material-card-shaped: icon + two lines */
+.sk-card{display:flex;align-items:center;gap:12px;padding:16px}
+.sk-ic{width:36px;height:36px;border-radius:50%;flex:none}
+.sk-flex{flex:1;display:flex;flex-direction:column;gap:8px}
+.sk-line{height:12px}
+.sk-line.sm{height:9px}
+.w35{width:35%}.w40{width:40%}.w50{width:50%}.w60{width:60%}.w70{width:70%}.w90{width:90%}
+/* list-row-shaped: line + trailing badge */
+.sk-rowline{display:flex;justify-content:space-between;align-items:center;padding:12px 0}
+.sk-badge{width:30px;height:20px;border-radius:999px;flex:none}
+/* text-block-shaped (summaries, item loading) */
+.sk-stack .sk{margin:10px 0;display:block}
+
+/* ============================================================
+   Empty states
+   ============================================================ */
+.empty{display:flex;flex-direction:column;align-items:center;text-align:center;padding:26px 12px 10px}
+.empty svg{width:84px;height:84px;color:var(--ink-25);animation:floaty 3.6s ease-in-out infinite}
+.empty-t{font-size:var(--fs-h);font-weight:600;letter-spacing:-.005em;color:var(--ink);margin-top:14px}
+.empty-s{color:var(--ink-55);font-size:var(--fs-sm);line-height:1.55;margin-top:6px;max-width:270px}
+.empty-cta{width:auto;margin-top:18px;border-radius:999px;padding:12px 24px}
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}

@@ -49,6 +49,46 @@ const hap = (t) => { try { tg?.HapticFeedback?.notificationOccurred(t); } catch 
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const MODE_META = { quiz: { t: '🧠 Quiz', ic: '🧠' }, summary: { t: '📝 Summary', ic: '📝' }, simple: { t: '💡 Simple explanation', ic: '💡' } };
 
+// ---------- Skeletons & empty states ----------
+const SVG_DOC = `<svg viewBox="0 0 96 96" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  <path d="M32 18h22l12 12v40a4 4 0 0 1-4 4H32a4 4 0 0 1-4-4V22a4 4 0 0 1 4-4Z" fill="#fff"/>
+  <path d="M54 18v8a4 4 0 0 0 4 4h8"/>
+  <path d="M36 42h20M36 50h16M36 58h20" opacity=".55" stroke-width="2"/>
+  <path d="M14 34h6M12 48h5M78 30h6M80 44h5" opacity=".3" stroke-width="2"/>
+</svg>`;
+const SVG_FOLDER = `<svg viewBox="0 0 96 96" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  <rect x="34" y="20" width="26" height="18" rx="3" fill="#fff"/>
+  <path d="M40 27h12M40 32h8" opacity=".55" stroke-width="2"/>
+  <path d="M16 38h22l6 6h32a4 4 0 0 1 4 4v22a4 4 0 0 1-4 4H16a4 4 0 0 1-4-4V42a4 4 0 0 1 4-4Z" fill="#fff"/>
+</svg>`;
+function emptyState(kind) {
+  if (kind === 'materials') {
+    return `<div class="card"><div class="empty">${SVG_DOC}
+      <div class="empty-t">No materials yet</div>
+      <div class="empty-s">Send a PDF to the bot in chat — or paste your notes below — and they'll become quizzes and summaries.</div>
+      <button class="btn-grad empty-cta" data-action="upload">📄 Upload a PDF</button>
+    </div></div>`;
+  }
+  return `<div class="empty">${SVG_FOLDER}
+    <div class="empty-t">Nothing generated yet</div>
+    <div class="empty-s">Turn this material into a quiz, a summary, or a simple explanation.</div>
+    <button class="btn-grad empty-cta" data-action="gen-quiz">🧠 Make your first quiz</button>
+  </div>`;
+}
+function wireEmpty(scope) {
+  (scope || document).querySelectorAll('[data-action]').forEach((b) => b.addEventListener('click', () => {
+    if (b.dataset.action === 'upload') {
+      const bot = ME && ME.referral_link ? ME.referral_link.split('?')[0].replace('https://t.me/', '') : '';
+      if (!bot) return;
+      const url = `https://t.me/${bot}`;
+      if (tg && tg.openTelegramLink) tg.openTelegramLink(url); else window.open(url, '_blank');
+    } else if (b.dataset.action === 'gen-quiz') {
+      const q = document.querySelector('.gen-btn[data-mode="quiz"]');
+      if (q) q.click();
+    }
+  }));
+}
+
 // ---------- Tabs + internal views ----------
 document.querySelectorAll('[data-go]').forEach((el) => el.addEventListener('click', () => go(el.dataset.go)));
 function go(screen) {
@@ -102,7 +142,8 @@ async function loadMaterials() {
   const data = await api('/api/materials', { initData: initData() });
   const box = $('matList');
   if (!data.ok || !data.materials || !data.materials.length) {
-    box.innerHTML = '<div class="muted" style="margin:0 16px">No materials yet — add one above, or send a PDF to the bot in chat 📄</div>';
+    box.innerHTML = emptyState('materials');
+    wireEmpty(box);
     return;
   }
   MATERIALS = data.materials;
@@ -156,7 +197,8 @@ function renderDetail() {
   $('detailText').textContent = currentMaterial.content.slice(0, 2000) + (currentMaterial.content.length > 2000 ? '…' : '');
   $('itemList').innerHTML = currentItems.length
     ? currentItems.map((it) => `<div class="wd-item item-row" data-id="${it.id}" data-type="${it.type}"><div><b>${MODE_META[it.type] ? MODE_META[it.type].t : it.type}</b><br><span class="muted" style="margin:0">${fmtDate(it.created_at)}</span></div><span class="chev">›</span></div>`).join('')
-    : 'Nothing yet — generate something above!';
+    : emptyState('items');
+  if (!currentItems.length) wireEmpty($('itemList'));
   $('itemList').querySelectorAll('.item-row').forEach((r) => r.addEventListener('click', () => openItem(Number(r.dataset.id), r.dataset.type)));
 }
 
@@ -191,9 +233,12 @@ document.querySelectorAll('.gen-btn').forEach((b) => b.addEventListener('click',
 // ---------- Item rendering ----------
 function openItem(id, type) {
   if (DEMO) { renderItem(); return; }
-  // items list only carries ids; re-generate view from a fresh detail fetch would cost a call — fetch item content directly
+  // items list only carries ids — fetch item content directly
+  $('itemTitle').textContent = (MODE_META[type] || { t: type }).t;
+  $('itemBody').innerHTML = '<div class="sk-stack"><div class="sk sk-line"></div><div class="sk sk-line w90"></div><div class="sk sk-line w70"></div><div class="sk sk-line w50"></div></div>';
+  showView('item');
   api(`/api/item?id=${id}`, { initData: initData() }).then((data) => {
-    if (!data.ok) return;
+    if (!data.ok) { $('itemBody').innerHTML = '<div class="muted">⚠️ Could not load this item.</div>'; return; }
     currentItem = { id, type: data.item.type, content: data.item.content };
     renderItem();
   });

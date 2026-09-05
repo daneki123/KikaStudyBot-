@@ -6,6 +6,10 @@
   <title>Kika — Study with AI</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
+  <!-- Typography: Inter (falls back to SF Pro / system fonts — Telegram-native feel) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -41,7 +45,11 @@
               <div id="matStatus" class="muted"></div>
               <div class="muted">📄 Or send any <b>PDF</b> to the bot in chat — it lands here automatically.</div>
             </div>
-            <div id="matList" class="muted" style="margin:0 16px">Loading…</div>
+            <div id="matList">
+              <div class="card sk-card"><div class="sk sk-ic"></div><div class="sk-flex"><div class="sk sk-line w60"></div><div class="sk sk-line w35 sm"></div></div></div>
+              <div class="card sk-card"><div class="sk sk-ic"></div><div class="sk-flex"><div class="sk sk-line w60"></div><div class="sk sk-line w35 sm"></div></div></div>
+              <div class="card sk-card"><div class="sk sk-ic"></div><div class="sk-flex"><div class="sk sk-line w60"></div><div class="sk sk-line w35 sm"></div></div></div>
+            </div>
           </div>
 
           <!-- DETAIL VIEW -->
@@ -59,7 +67,7 @@
             </div>
             <div class="card">
               <div class="card-h">🗂 Saved items</div>
-              <div id="itemList" class="muted">Nothing yet — generate something above!</div>
+              <div id="itemList"><div class="sk-stack"><div class="sk sk-line"></div><div class="sk sk-line w70"></div><div class="sk sk-line w50"></div></div></div>
             </div>
             <div class="card">
               <div class="card-h">📄 Material text</div>
@@ -123,7 +131,11 @@
       <section data-screen="admin" class="screen">
         <div class="study-scroll">
           <h2 class="screen-title">⚙️ Admin · Top students</h2>
-          <div id="adminList" class="muted" style="margin:0 16px">Loading…</div>
+          <div id="adminList" style="margin:0 16px">
+            <div class="sk-rowline"><div class="sk sk-line w50"></div><div class="sk sk-badge"></div></div>
+            <div class="sk-rowline"><div class="sk sk-line w40"></div><div class="sk sk-badge"></div></div>
+            <div class="sk-rowline"><div class="sk sk-line w60"></div><div class="sk sk-badge"></div></div>
+          </div>
         </div>
       </section>
 
@@ -137,5 +149,5 @@
   </div>
 
   <script src="app.js"></script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a366d2daa8e08077',t:'MTc4ODYyNzk3Nw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
