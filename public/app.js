@@ -114,7 +114,7 @@ function go(screen) {
   document.querySelectorAll('.tab').forEach((t) => t.classList.toggle('active', t.dataset.go === screen));
   if (screen === 'boost') renderBoost();
   if (screen === 'admin') DEMO ? ($('adminList').innerHTML = '<div class="muted">Admin stats appear here for the owner.</div>') : loadAdmin();
-  try { if (location.hash !== '#/' + screen) location.hash = '#/' + screen; } catch (e) {} // keep the URL in sync (deep-linkable; sandbox-safe)
+  try { if (location.hash.indexOf('tgWebAppData') === -1 && location.hash !== '#/' + screen) location.hash = '#/' + screen; } catch (e) {} // sync URL (never clobber Telegram's fragment)
   $('.screens').scrollTop = 0;
 }
 document.querySelectorAll('[data-back]').forEach((el) => el.addEventListener('click', () => showView(el.dataset.back)));
@@ -133,9 +133,12 @@ function showNotFound() {
   $('.screens').scrollTop = 0;
 }
 function handleRoute() {
-  const h = (location.hash || '#/study').replace(/^#\/?/, '').toLowerCase();
+  const raw = location.hash || '';
+  // Telegram passes its own data in the fragment (#tgWebAppData=…) — that is NOT a route. Treat it as Home.
+  if (!raw || raw === '#' || raw.toLowerCase().indexOf('tgwebappdata') !== -1) { go('study'); return; }
+  const h = raw.replace(/^#\/?/, '').toLowerCase();
   if (Object.prototype.hasOwnProperty.call(ROUTES, h)) go(ROUTES[h]);
-  else showNotFound(); // unmatched URL → 404 view
+  else showNotFound(); // genuinely unmatched URL → 404 view
 }
 window.addEventListener('hashchange', handleRoute);
 // error boundary — catch fatal errors instead of a frozen screen
@@ -420,8 +423,21 @@ function demoGenerate(mode) {
   renderItem();
 }
 
+// ---------- Theme (light / dark) ----------
+function applyTheme(t) {
+  document.documentElement.dataset.theme = t;
+  const btn = $('themeBtn'); if (btn) btn.textContent = t === 'dark' ? '☀️' : '🌙';
+  try { localStorage.setItem('kika-theme', t); } catch (e) {}
+  try { if (tg && tg.setBackgroundColor) tg.setBackgroundColor(t === 'dark' ? '#0B1120' : '#F6F4EE'); } catch (e) {} // blend Telegram chrome
+}
+(function initTheme() {
+  let t = 'light';
+  try { t = localStorage.getItem('kika-theme') || 'light'; } catch (e) {}
+  applyTheme(t);
+})();
+$('themeBtn').addEventListener('click', () => applyTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'));
+
 // ---------- Boot ----------
-try { if (tg && tg.setBackgroundColor) tg.setBackgroundColor('#F6F4EE'); } catch (e) {} // blend Telegram chrome with the paper theme
 initAds();
 load();
 handleRoute(); // route the initial URL (deep links work; unknown → 404)

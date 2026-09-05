@@ -8,10 +8,10 @@
 :root{
   /* ---- Ink: Deep Slate Blue — primary text, headers, structure ---- */
   --ink:#0F172A;
-  --ink-70:rgba(15,23,42,.72);
-  --ink-55:rgba(15,23,42,.55);
-  --ink-40:rgba(15,23,42,.40);
-  --ink-25:rgba(15,23,42,.25);
+  --ink-70:rgba(15,23,42,.80);
+  --ink-55:rgba(15,23,42,.68);
+  --ink-40:rgba(15,23,42,.55);
+  --ink-25:rgba(15,23,42,.32);
   --ink-12:rgba(15,23,42,.12);
   --ink-08:rgba(15,23,42,.08);
   --ink-04:rgba(15,23,42,.04);
@@ -20,6 +20,15 @@
   --paper:#F6F4EE;
   --card:#FFFFFF;
   --inset:#F1EEE6;
+
+  /* ---- Glass & chrome surfaces (theme-aware) ---- */
+  --glass:rgba(255,255,255,.7);
+  --glass-strong:rgba(255,255,255,.85);
+  --glass-line:rgba(0,0,0,.1);
+  --chrome:rgba(246,244,238,.85);
+  --chrome-2:rgba(255,255,255,.92);
+  --veil:rgba(246,244,238,.9);
+  --sk:rgba(15,23,42,.08);
 
   /* ---- Accent: Telegram blue ---- */
   --accent:#2481CC;
@@ -46,6 +55,46 @@
   --radius-sm:12px;
   --shadow:0 1px 2px rgba(15,23,42,.04),0 10px 30px rgba(15,23,42,.06);
   --tg-bottom:env(safe-area-inset-bottom,0px);
+}
+
+/* ---- Dark theme ---- */
+[data-theme="dark"]{
+  --ink:#E7EEF9;
+  --ink-70:rgba(231,238,249,.82);
+  --ink-55:rgba(231,238,249,.70);
+  --ink-40:rgba(231,238,249,.56);
+  --ink-25:rgba(231,238,249,.34);
+  --ink-12:rgba(231,238,249,.15);
+  --ink-08:rgba(231,238,249,.11);
+  --ink-04:rgba(231,238,249,.06);
+  --paper:#0B1120;
+  --card:#121B30;
+  --inset:#0E1628;
+  --glass:rgba(18,27,48,.62);
+  --glass-strong:rgba(15,22,40,.82);
+  --glass-line:rgba(231,238,249,.15);
+  --chrome:rgba(11,17,32,.85);
+  --chrome-2:rgba(13,20,36,.94);
+  --veil:rgba(7,11,20,.9);
+  --sk:rgba(231,238,249,.10);
+  --accent:#3EA6EE;
+  --accent-press:#2E8FD6;
+  --accent-soft:rgba(62,166,238,.16);
+  --good:#3BCF82; --good-soft:rgba(59,207,130,.14);
+  --bad:#F26B60;  --bad-soft:rgba(242,107,96,.14);
+  --gold:#D9AB55; --gold-soft:rgba(217,171,85,.14);
+  --shadow:0 1px 2px rgba(0,0,0,.35),0 12px 34px rgba(0,0,0,.4);
+}
+[data-theme="dark"] .bg::after{
+  background:
+    radial-gradient(120% 90% at 50% 0%,rgba(62,166,238,.07),transparent 55%),
+    radial-gradient(140% 110% at 50% 115%,rgba(0,0,0,.45),transparent 60%);
+}
+[data-theme="dark"] .grid{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Cpath d='M24 0H0V24' fill='none' stroke='%23E7EEF9' stroke-opacity='0.07'/%3E%3C/svg%3E");
+}
+[data-theme="dark"] .sk::after{
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.16),transparent);
 }
 
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -101,7 +150,7 @@ body{
 .topbar{
   display:flex;align-items:center;justify-content:space-between;
   padding:14px 20px 12px;
-  background:rgba(246,244,238,.85);
+  background:var(--chrome);
   backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
   border-bottom:1px solid var(--ink-08);      /* structural outline */
   z-index:5;
@@ -137,10 +186,10 @@ body{
    Cards & forms
    ============================================================ */
 .card{
-  background:rgba(255,255,255,.7);          /* glassmorphism */
+  background:var(--glass);          /* glassmorphism */
   backdrop-filter:blur(10px);
   -webkit-backdrop-filter:blur(10px);
-  border:1px solid rgba(0,0,0,.1);
+  border:1px solid var(--glass-line);
   border-radius:var(--radius);
   padding:16px;margin:0 16px 14px;
   box-shadow:var(--shadow);
@@ -284,7 +333,7 @@ body{
    ============================================================ */
 .tabbar{
   display:flex;
-  background:rgba(255,255,255,.92);
+  background:var(--chrome-2);
   backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
   border-top:1px solid var(--ink-08);
   padding-bottom:var(--tg-bottom);z-index:6;
@@ -310,7 +359,7 @@ body{
 /* ============================================================
    Skeleton loaders (match expected content heights)
    ============================================================ */
-.sk{position:relative;overflow:hidden;background:rgba(15,23,42,.07);border-radius:6px}
+.sk{position:relative;overflow:hidden;background:var(--sk);border-radius:6px}
 .sk::after{
   content:"";position:absolute;inset:0;transform:translateX(-100%);
   background:linear-gradient(90deg,transparent,rgba(255,255,255,.75),transparent);
@@ -351,9 +400,9 @@ body{
 }
 .toast{
   display:flex;align-items:center;gap:10px;max-width:100%;
-  background:rgba(255,255,255,.85);
+  background:var(--glass-strong);
   backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
-  border:1px solid rgba(0,0,0,.1);
+  border:1px solid var(--glass-line);
   border-radius:999px;padding:11px 18px;
   font-size:var(--fs-sm);font-weight:600;color:var(--ink);
   box-shadow:0 8px 30px rgba(15,23,42,.14);
@@ -374,9 +423,9 @@ body{
 .nf-inner{flex:1;display:flex;align-items:center;justify-content:center;padding:24px 16px;overflow-y:auto}
 .nf-card{
   width:min(100%,340px);text-align:center;
-  background:rgba(255,255,255,.7);           /* glassmorphism */
+  background:var(--glass);           /* glassmorphism */
   backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
-  border:1px solid rgba(0,0,0,.1);
+  border:1px solid var(--glass-line);
   border-radius:var(--radius);padding:30px 22px 26px;
   box-shadow:var(--shadow);
 }
@@ -403,7 +452,7 @@ body{
 #errBoundary{
   position:fixed;inset:0;z-index:100;
   display:flex;align-items:center;justify-content:center;padding:24px;
-  background:rgba(246,244,238,.9);
+  background:var(--veil);
   backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
 }
 #errBoundary[hidden]{display:none} /* keep the hidden attribute working despite display:flex */
@@ -414,3 +463,25 @@ body{
   background:var(--ink-04);color:var(--ink-70);
   font-size:11px;line-height:1.5;white-space:pre-wrap;
 }
+
+
+/* solid fallback where backdrop-filter is unsupported or misrenders (keeps text visible on all devices) */
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+  .card,.toast,.nf-card,.theme-btn{background:var(--card)}
+  #errBoundary{background:var(--paper)}
+}
+
+/* ============================================================
+   Theme toggle
+   ============================================================ */
+.top-actions{display:flex;align-items:center;gap:10px}
+.theme-btn{
+  width:38px;height:38px;border-radius:50%;
+  border:1px solid var(--glass-line);
+  background:var(--glass);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  font-size:16px;line-height:1;cursor:pointer;
+  display:grid;place-items:center;
+  transition:transform .1s;
+}
+.theme-btn:active{transform:scale(.92)}
