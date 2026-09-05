@@ -109,10 +109,12 @@ function wireEmpty(scope) {
 // ---------- Tabs + internal views ----------
 document.querySelectorAll('[data-go]').forEach((el) => el.addEventListener('click', () => go(el.dataset.go)));
 function go(screen) {
+  if (!document.querySelector('.screen[data-screen="' + screen + '"]')) { showNotFound(); return; } // unmatched route → 404
   document.querySelectorAll('.screen').forEach((s) => s.classList.toggle('active', s.dataset.screen === screen));
   document.querySelectorAll('.tab').forEach((t) => t.classList.toggle('active', t.dataset.go === screen));
   if (screen === 'boost') renderBoost();
   if (screen === 'admin') DEMO ? ($('adminList').innerHTML = '<div class="muted">Admin stats appear here for the owner.</div>') : loadAdmin();
+  try { if (location.hash !== '#/' + screen) location.hash = '#/' + screen; } catch (e) {} // keep the URL in sync (deep-linkable; sandbox-safe)
   $('.screens').scrollTop = 0;
 }
 document.querySelectorAll('[data-back]').forEach((el) => el.addEventListener('click', () => showView(el.dataset.back)));
@@ -122,6 +124,33 @@ function showView(v) {
   $('viewItem').hidden = v !== 'item';
   $('.screens').scrollTop = 0;
 }
+
+// ---------- Router (hash routes) + 404 + error boundary ----------
+const ROUTES = { study: 'study', boost: 'boost', admin: 'admin' };
+function showNotFound() {
+  document.querySelectorAll('.screen').forEach((s) => s.classList.toggle('active', s.dataset.screen === 'notfound'));
+  document.querySelectorAll('.tab').forEach((t) => t.classList.remove('active'));
+  $('.screens').scrollTop = 0;
+}
+function handleRoute() {
+  const h = (location.hash || '#/study').replace(/^#\/?/, '').toLowerCase();
+  if (Object.prototype.hasOwnProperty.call(ROUTES, h)) go(ROUTES[h]);
+  else showNotFound(); // unmatched URL → 404 view
+}
+window.addEventListener('hashchange', handleRoute);
+// error boundary — catch fatal errors instead of a frozen screen
+let errLastShown = 0;
+function showErrorBoundary(detail) {
+  if (Date.now() - errLastShown < 3000) return; // ignore error storms
+  errLastShown = Date.now();
+  $('errDetail').textContent = String(detail || '');
+  $('errBoundary').hidden = false;
+}
+window.addEventListener('error', (e) => { if (e && e.message) showErrorBoundary(e.message + (e.filename ? '\n' + e.filename + ':' + e.lineno : '')); });
+window.addEventListener('unhandledrejection', (e) => showErrorBoundary(e.reason && (e.reason.stack || e.reason.message) || e.reason));
+$('nfHomeBtn').addEventListener('click', () => go('study'));
+$('errHomeBtn').addEventListener('click', () => { $('errBoundary').hidden = true; go('study'); });
+$('errReloadBtn').addEventListener('click', () => location.reload());
 
 // ---------- Quota ----------
 function renderQuota(remaining, premium) {
@@ -395,3 +424,4 @@ function demoGenerate(mode) {
 try { if (tg && tg.setBackgroundColor) tg.setBackgroundColor('#F6F4EE'); } catch (e) {} // blend Telegram chrome with the paper theme
 initAds();
 load();
+handleRoute(); // route the initial URL (deep links work; unknown → 404)
